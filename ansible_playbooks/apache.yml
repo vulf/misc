@@ -1,0 +1,19 @@
+---
+- name: Ensure apache is installed and running
+  hosts: webservers
+  remote_user: root
+  tasks:
+          - name: Ensure apache is installed
+            command: systemctl status apache2
+            register: status
+            ignore_errors: yes
+
+          - name: Install apache if it is not installed
+            apt:
+                    name: apache2
+            when: status.stderr.find('Unit apache2.service could not be found') == 0
+
+          - name: Start apache2 service
+            systemd:
+                    state: started
+                    name: apache2
